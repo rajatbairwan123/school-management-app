@@ -1,0 +1,31 @@
+/* Buttons */
+
+.btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition;
+}
+
+.btn-secondary {
+    @apply bg-gray-600 text-white px-4 py-2 rounded-md shadow;
+}
+
+.btn-danger {
+    @apply bg-red-600 text-white px-4 py-2 rounded-md shadow;
+}
+
+/* Cards */
+
+.card {
+    @apply bg-white p-5 rounded-lg shadow-sm;
+}
+
+/* Form Inputs */
+
+.form-input {
+    @apply border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-primary;
+}
+
+/* Page Title */
+
+.page-title {
+    @apply text-2xl font-semibold text-gray-700;
+}
