@@ -1,31 +1,29 @@
-/* Buttons */
+@layer components {
+    /* Cards */
 
-.btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition;
-}
+    .card {
+        @apply bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition;
+    }
 
-.btn-secondary {
-    @apply bg-gray-600 text-white px-4 py-2 rounded-md shadow;
-}
+    /* Buttons */
 
-.btn-danger {
-    @apply bg-red-600 text-white px-4 py-2 rounded-md shadow;
-}
+    .btn-primary {
+        @apply bg-primary text-white px-4 py-2 rounded-md hover:opacity-90 transition;
+    }
 
-/* Cards */
+    /* Sidebar */
 
-.card {
-    @apply bg-white p-5 rounded-lg shadow-sm;
-}
+    .sidebar-link {
+        @apply flex items-center gap-3 p-2 rounded hover:bg-gray-700 transition;
+    }
 
-/* Form Inputs */
+    /* Page title */
 
-.form-input {
-    @apply border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-primary;
-}
+    .page-title {
+        @apply text-2xl font-semibold text-gray-700;
+    }
 
-/* Page Title */
-
-.page-title {
-    @apply text-2xl font-semibold text-gray-700;
+    .sidebar-link {
+        @apply flex items-center gap-3 p-2 rounded-md transition duration-200 hover:bg-gray-700 hover:text-white;
+    }
 }
