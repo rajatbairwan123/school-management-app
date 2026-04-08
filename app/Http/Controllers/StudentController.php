@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Models\SchoolClass;
 use App\Models\Section;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
@@ -14,7 +17,11 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::with(['class', 'section'])->latest()->get();
+        $students = Student::where('school_id', Auth::user()->school_id)
+            ->where('status', 1)
+            ->latest()
+            ->with('user')
+            ->get();
         return view('students.index', compact('students'));
     }
 
@@ -23,7 +30,9 @@ class StudentController extends Controller
      */
     public function create()
     {
-        $classes = SchoolClass::all();
+        $classes = SchoolClass::where('school_id', Auth::user()->school_id)
+            ->where('status', 1)
+            ->get();
 
         return view('students.create', compact('classes'));
     }
@@ -33,7 +42,35 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        Student::create($request->all());
+        $request->validate([
+            'name' => 'required',
+            'username' => 'required|unique:users,username',
+            'class_id' => 'required',
+            'section_id' => 'nullable|exists:sections,id'
+        ]);
+
+        // Create User
+        $user = User::create([
+            'name' => $request->name,
+            'username' => $request->username,
+            'password' => Hash::make('1234'),
+            'role' => 'student',
+            'school_id' => Auth::user()->school_id,
+            'status' => 1
+        ]);
+
+        // Create Student
+        Student::create([
+            'user_id' => $user->id,
+            'school_id' => Auth::user()->school_id,
+            'class_id' => $request->class_id,
+            'section_id' => $request->section_id ?? null,
+            'father_name' => $request->father_name,
+            'dob' => $request->dob,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'status' => 1
+        ]);
 
         return redirect()->route('students.index')
             ->with('success', 'Student Added Successfully');
@@ -83,7 +120,10 @@ class StudentController extends Controller
 
     public function getSections($id)
     {
-        $sections = Section::where('class_id', $id)->get();
+        $sections = Section::where('class_id', $id)
+            ->where('school_id', Auth::user()->school_id)
+            ->where('status', 1)
+            ->get();
 
         return response()->json($sections);
     }

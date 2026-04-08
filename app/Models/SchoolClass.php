@@ -7,11 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class SchoolClass extends Model
 {
     protected $fillable = [
-        'class_name'
+        'school_id',
+        'class_name',
+        'status'
     ];
 
     public function sections()
     {
         return $this->hasMany(Section::class);
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
     }
 }

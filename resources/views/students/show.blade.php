@@ -20,7 +20,7 @@
 
             <div>
                 <label class="text-gray-500">Student Name</label>
-                <p class="font-semibold">{{ $student->name }}</p>
+                <p class="font-semibold">{{ $student->user->name ?? '' }}</p>
             </div>
 
             <div>

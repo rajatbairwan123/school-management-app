@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Section;
 use Illuminate\Http\Request;
 use App\Models\SchoolClass;
+use Illuminate\Support\Facades\Auth;
 
 class SectionController extends Controller
 {
@@ -13,7 +14,10 @@ class SectionController extends Controller
      */
     public function index()
     {
-        $sections = Section::with('class')->latest()->get();
+        $sections = Section::where('school_id', Auth::user()->school_id)
+            ->where('status', 1)
+            ->latest()
+            ->get();
 
         return view('sections.index', compact('sections'));
     }
@@ -23,7 +27,10 @@ class SectionController extends Controller
      */
     public function create()
     {
-        $classes = SchoolClass::all();
+        $classes = SchoolClass::where('school_id', Auth::user()->school_id)
+            ->where('status', 1)
+            ->get();
+
         return view('sections.create', compact('classes'));
     }
 
@@ -32,9 +39,16 @@ class SectionController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'class_id' => 'required',
+            'section_name' => 'required'
+        ]);
+
         Section::create([
+            'school_id' => Auth::user()->school_id,
             'class_id' => $request->class_id,
-            'section_name' => $request->section_name
+            'section_name' => $request->section_name,
+            'status' => 1
         ]);
 
         return redirect()->route('sections.index')
@@ -54,8 +68,12 @@ class SectionController extends Controller
      */
     public function edit($id)
     {
-        $section = Section::findOrFail($id);
-        $classes = SchoolClass::all();
+        $section = Section::where('school_id', Auth::user()->school_id)
+            ->findOrFail($id);
+
+        $classes = SchoolClass::where('school_id', Auth::user()->school_id)
+            ->where('status', 1)
+            ->get();
 
         return view('sections.edit', compact('section', 'classes'));
     }
@@ -65,7 +83,13 @@ class SectionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $section = Section::findOrFail($id);
+        $request->validate([
+            'class_id' => 'required',
+            'section_name' => 'required'
+        ]);
+
+        $section = Section::where('school_id', Auth::user()->school_id)
+            ->findOrFail($id);
 
         $section->update([
             'class_id' => $request->class_id,
@@ -81,7 +105,13 @@ class SectionController extends Controller
      */
     public function destroy($id)
     {
-        Section::findOrFail($id)->delete();
+        $section = Section::where('school_id', Auth::user()->school_id)
+            ->findOrFail($id);
+
+        // Soft delete
+        $section->update([
+            'status' => 0
+        ]);
 
         return redirect()->route('sections.index')
             ->with('success', 'Section Deleted Successfully');

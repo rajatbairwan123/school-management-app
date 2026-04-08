@@ -42,7 +42,7 @@
                     <tr class="border-t">
 
                         <td class="p-3">{{ $loop->iteration }}</td>
-                        <td class="p-3">{{ $student->name }}</td>
+                        <td class="p-3">{{ $student->user->name ?? '' }}</td>
                         <td class="p-3">{{ $student->class->class_name ?? '' }}</td>
                         <td class="p-3">{{ $student->section->section_name ?? '' }}</td>
                         <td class="p-3">{{ $student->phone }}</td>

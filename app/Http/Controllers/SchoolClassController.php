@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SchoolClass;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SchoolClassController extends Controller
 {
@@ -12,7 +13,10 @@ class SchoolClassController extends Controller
      */
     public function index()
     {
-        $classes = SchoolClass::latest()->get();
+        $classes = SchoolClass::where('school_id', Auth::user()->school_id)
+            ->where('status', 1)
+            ->latest()
+            ->get();
 
         return view('classes.index', compact('classes'));
     }
@@ -30,8 +34,14 @@ class SchoolClassController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'class_name' => 'required'
+        ]);
+
         SchoolClass::create([
-            'class_name' => $request->class_name
+            'school_id' => Auth::user()->school_id,
+            'class_name' => $request->class_name,
+            'status' => 1
         ]);
 
         return redirect()->route('classes.index')
@@ -51,7 +61,8 @@ class SchoolClassController extends Controller
      */
     public function edit($id)
     {
-        $class = SchoolClass::findOrFail($id);
+        $class = SchoolClass::where('school_id', Auth::user()->school_id)
+            ->findOrFail($id);
 
         return view('classes.edit', compact('class'));
     }
@@ -61,7 +72,12 @@ class SchoolClassController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $class = SchoolClass::findOrFail($id);
+        $request->validate([
+            'class_name' => 'required'
+        ]);
+
+        $class = SchoolClass::where('school_id', Auth::user()->school_id)
+            ->findOrFail($id);
 
         $class->update([
             'class_name' => $request->class_name
@@ -76,7 +92,13 @@ class SchoolClassController extends Controller
      */
     public function destroy($id)
     {
-        SchoolClass::findOrFail($id)->delete();
+        $class = SchoolClass::where('school_id', Auth::user()->school_id)
+            ->findOrFail($id);
+
+        // Soft Delete (Better for ERP)
+        $class->update([
+            'status' => 0
+        ]);
 
         return redirect()->route('classes.index')
             ->with('success', 'Class Deleted Successfully');

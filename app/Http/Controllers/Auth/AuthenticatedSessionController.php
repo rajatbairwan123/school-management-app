@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\School;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -16,7 +17,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        $school = School::where('status', 1)->first();
+        return view('auth.login', compact('school'));
     }
 
     /**
