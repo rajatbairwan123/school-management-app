@@ -3,26 +3,39 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SchoolClassController;
+use App\Http\Controllers\SectionController;
+
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
 
-Route::middleware(['auth','role:admin|teacher'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class,'index'])->name('dashboard');
-});
+Route::middleware(['auth'])->group(function () {
 
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware('role:admin|teacher')
+        ->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Students
+    Route::resource('students', StudentController::class);
+
+    // Classes
+    Route::resource('classes', SchoolClassController::class);
+
+    // Sections
+    Route::resource('sections', SectionController::class);
 });
 
 
-require __DIR__.'/auth.php';
+Route::get('/get-sections/{id}', [StudentController::class, 'getSections']);
+
+require __DIR__ . '/auth.php';
