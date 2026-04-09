@@ -1,11 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="flex justify-between mb-6">
 
-        <h2 class="text-2xl font-bold">Classes</h2>
+    <div class="flex items-center justify-between mb-6">
 
-        <a href="{{ route('classes.create') }}" class="btn-primary">
+        <h2 class="text-2xl font-bold text-gray-800">
+            Classes
+        </h2>
+
+        <a href="{{ route('classes.create') }}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
             Add Class
         </a>
 
@@ -19,44 +22,97 @@
     @endif
 
 
-    <div class="bg-white shadow rounded">
 
-        <table class="w-full">
+    <div class="bg-white shadow rounded-lg overflow-hidden">
 
-            <thead class="bg-gray-100">
+        <table class="min-w-full divide-y divide-gray-200">
+
+            <thead class="bg-gray-50">
 
                 <tr>
-                    <th class="p-3">id</th>
-                    <th class="p-3">Class Name</th>
-                    <th class="p-3">Action</th>
+
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        #
+                    </th>
+
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Class Name
+                    </th>
+
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Sections
+                    </th>
+
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                        Action
+                    </th>
+
                 </tr>
 
             </thead>
 
-            <tbody>
+
+
+            <tbody class="bg-white divide-y divide-gray-200">
 
                 @forelse($classes as $class)
-                    <tr class="border-t">
+                    <tr class="hover:bg-gray-50">
 
-                        <td class="p-3">{{ $loop->iteration }}</td>
-                        <td class="p-3">{{ $class->class_name }}</td>
+                        <td class="px-6 py-4">
+                            {{ $loop->iteration }}
+                        </td>
 
-                        <td class="p-3 flex gap-2">
 
-                            <a href="{{ route('classes.edit', $class->id) }}" class="text-blue-600">
-                                Edit
-                            </a>
+                        <td class="px-6 py-4 font-medium text-gray-800">
+                            {{ $class->class_name }}
+                        </td>
 
-                            <form method="POST" action="{{ route('classes.destroy', $class->id) }}">
 
-                                @csrf
-                                @method('DELETE')
+                        <td class="px-6 py-4">
 
-                                <button class="text-red-600">
-                                    Delete
-                                </button>
+                            @if ($class->sections->count() > 0)
+                                <div class="flex flex-wrap gap-2">
 
-                            </form>
+                                    @foreach ($class->sections as $section)
+                                        <span class="px-2 py-1 text-xs bg-indigo-100 text-indigo-700 rounded">
+                                            {{ $section->section_name }}
+                                        </span>
+                                    @endforeach
+
+                                </div>
+                            @else
+                                <span class="text-gray-400 text-sm">
+                                    No Sections
+                                </span>
+                            @endif
+
+                        </td>
+
+
+
+                        <td class="px-6 py-4 text-right">
+
+                            <div class="flex justify-end gap-4">
+
+                                <a href="{{ route('classes.edit', $class->id) }}"
+                                    class="text-blue-600 hover:text-blue-800 font-medium">
+                                    Edit
+                                </a>
+
+
+                                <form method="POST" action="{{ route('classes.destroy', $class->id) }}"
+                                    onsubmit="return confirm('Are you sure you want to delete this class?')">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button class="text-red-600 hover:text-red-800 font-medium">
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </div>
 
                         </td>
 
@@ -65,9 +121,11 @@
                 @empty
 
                     <tr>
-                        <td colspan="3" class="p-3 text-center">
+
+                        <td colspan="4" class="px-6 py-6 text-center text-gray-500">
                             No Classes Found
                         </td>
+
                     </tr>
                 @endforelse
 
@@ -76,4 +134,5 @@
         </table>
 
     </div>
+
 @endsection

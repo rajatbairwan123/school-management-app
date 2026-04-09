@@ -15,11 +15,6 @@ class Section extends Model
 
     public function class()
     {
-        return $this->belongsTo(SchoolClass::class);
-    }
-
-    public function school()
-    {
-        return $this->belongsTo(School::class);
+        return $this->belongsTo(SchoolClass::class, 'class_id');
     }
 }

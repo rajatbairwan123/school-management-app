@@ -12,35 +12,48 @@
 
     </div>
 
+
     <div class="bg-white p-6 rounded-xl shadow-sm border">
 
         <form action="{{ route('students.store') }}" method="POST">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+
                 <!-- Student Name -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Student Name
+                        Student Name <span class="text-red-500">*</span>
                     </label>
 
-                    <input type="text" name="name"
-                        class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required>
+                    <input type="text" name="name" value="{{ old('name') }}"
+                        class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+
+                    @error('name')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+
                 </div>
+
+
 
                 <!-- Username -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Username
+                        Username <span class="text-red-500">*</span>
                     </label>
 
-                    <input type="text" name="username"
-                        class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required>
+                    <input type="text" name="username" value="{{ old('username') }}"
+                        class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
 
-                    {{-- <small class="text-gray-500">
-                        Student will login using this username
-                    </small> --}}
+                    @error('username')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+
                 </div>
+
+
 
                 <!-- Father Name -->
                 <div>
@@ -48,14 +61,17 @@
                         Father Name
                     </label>
 
-                    <input type="text" name="father_name"
+                    <input type="text" name="father_name" value="{{ old('father_name') }}"
                         class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+
                 </div>
+
+
 
                 <!-- Class -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Class
+                        Class <span class="text-red-500">*</span>
                     </label>
 
                     <select name="class_id" id="class_id"
@@ -64,17 +80,24 @@
                         <option value="">Select Class</option>
 
                         @foreach ($classes as $class)
-                            <option value="{{ $class->id }}">
+                            <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>
                                 {{ $class->class_name }}
                             </option>
                         @endforeach
 
                     </select>
+
+                    @error('class_id')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+
                 </div>
+
+
 
                 <!-- Section -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <label id="section_label" class="block text-sm font-medium text-gray-700 mb-1">
                         Section
                     </label>
 
@@ -84,7 +107,14 @@
                         <option value="">Select Section</option>
 
                     </select>
+
+                    @error('section_id')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+
                 </div>
+
+
 
                 <!-- DOB -->
                 <div>
@@ -92,9 +122,12 @@
                         Date of Birth
                     </label>
 
-                    <input type="date" name="dob"
+                    <input type="date" name="dob" value="{{ old('dob') }}"
                         class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+
                 </div>
+
+
 
                 <!-- Phone -->
                 <div>
@@ -102,9 +135,12 @@
                         Phone
                     </label>
 
-                    <input type="text" name="phone"
+                    <input type="text" name="phone" value="{{ old('phone') }}"
                         class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+
                 </div>
+
+
 
                 <!-- Address -->
                 <div class="md:col-span-2">
@@ -113,22 +149,25 @@
                     </label>
 
                     <textarea name="address" rows="3"
-                        class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                    </textarea>
+                        class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">{{ old('address') }}</textarea>
+
                 </div>
 
 
             </div>
 
-            <!-- Buttons -->
 
+
+            <!-- Buttons -->
             <div class="mt-6 flex gap-3">
 
                 <button class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                    Save Student </button>
+                    Save Student
+                </button>
 
                 <a href="{{ route('students.index') }}" class="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
-                    Cancel </a>
+                    Cancel
+                </a>
 
             </div>
 
@@ -136,7 +175,6 @@
 
     </div>
 @endsection
-
 
 @push('scripts')
     <script>
@@ -146,12 +184,24 @@
 
                 var classId = $(this).val();
 
+                if (classId == '') {
+                    $('#section_id').html('<option value="">Select Section</option>');
+                    return;
+                }
+
                 $.ajax({
                     url: '/get-sections/' + classId,
                     type: 'GET',
                     success: function(data) {
 
-                        $('#section_id').html('<option>Select Section</option>');
+                        $('#section_id').html('<option value="">Select Section</option>');
+
+                        if (data.length > 0) {
+                            $('#section_label').html(
+                                'Section <span class="text-red-500">*</span>');
+                        } else {
+                            $('#section_label').html('Section');
+                        }
 
                         $.each(data, function(key, value) {
 
@@ -163,6 +213,7 @@
                         });
 
                     }
+
                 });
 
             });
