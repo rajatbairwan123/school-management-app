@@ -15,11 +15,15 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        $school = School::where('status', 1)->first();
+        $slug = $request->route('school');
+
+        $school = School::where('slug', $slug)->firstOrFail();
+
         return view('auth.login', compact('school'));
     }
+
 
     /**
      * Handle an incoming authentication request.
@@ -30,20 +34,25 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $school = $request->route('school');
+
+        return redirect()->intended("/{$school}/dashboard");
     }
+
 
     /**
      * Destroy an authenticated session.
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $school = $request->route('school');
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect("/{$school}/login");
     }
 }

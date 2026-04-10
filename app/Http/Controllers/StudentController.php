@@ -79,21 +79,28 @@ class StudentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($school, Student $student)
     {
-        $student = Student::findOrFail($id);
+        if ($student->school_id != Auth::user()->school_id) {
+            abort(404);
+        }
+
         return view('students.show', compact('student'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit($school, Student $student)
     {
-        $student = Student::findOrFail($id);
+        if ($student->school_id != Auth::user()->school_id) {
+            abort(404);
+        }
+
         $classes = SchoolClass::where('school_id', Auth::user()->school_id)
             ->where('status', 1)
             ->get();
+
         return view('students.edit', compact('student', 'classes'));
     }
 
@@ -110,14 +117,16 @@ class StudentController extends Controller
     //         ->with('success', 'Student Updated Successfully');
     // }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $school, Student $student)
     {
         $request->validate([
             'name' => 'required',
             'class_id' => 'required'
         ]);
 
-        $student = Student::with('user')->findOrFail($id);
+        $student = Student::with('user')
+            ->where('school_id', Auth::user()->school_id)
+            ->findOrFail($student->id);
 
 
         // Check if class has sections
@@ -157,9 +166,21 @@ class StudentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($school, Student $student)
     {
-        Student::findOrFail($id)->delete();
+        if ($student->school_id != Auth::user()->school_id) {
+            abort(404);
+        }
+
+        // Update student status
+        $student->update([
+            'status' => 0
+        ]);
+
+        // Update user status
+        $student->user->update([
+            'status' => 0
+        ]);
 
         return redirect()->route('students.index')
             ->with('success', 'Student Deleted Successfully');

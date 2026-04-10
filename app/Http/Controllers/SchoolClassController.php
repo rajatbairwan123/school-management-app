@@ -77,10 +77,11 @@ class SchoolClassController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit($school, SchoolClass $class)
     {
-        $class = SchoolClass::where('school_id', Auth::user()->school_id)
-            ->findOrFail($id);
+        if ($class->school_id != Auth::user()->school_id) {
+            abort(404);
+        }
 
         return view('classes.edit', compact('class'));
     }
@@ -89,17 +90,17 @@ class SchoolClassController extends Controller
      * Update the specified resource in storage.
      */
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $school, SchoolClass $class)
     {
+        if ($class->school_id != Auth::user()->school_id) {
+            abort(404);
+        }
+
         $request->validate([
             'class_name' => 'required',
             'sections' => 'required|array',
             'sections.*' => 'required'
         ]);
-
-        $class = SchoolClass::where('school_id', Auth::user()->school_id)
-            ->findOrFail($id);
-
 
         // Update Class
         $class->update([
@@ -129,13 +130,11 @@ class SchoolClassController extends Controller
 
             if (isset($submittedSectionIds[$key])) {
 
-                // Update Existing Section
                 Section::where('id', $submittedSectionIds[$key])->update([
                     'section_name' => $sectionName
                 ]);
             } else {
 
-                // Insert New Section
                 Section::create([
                     'school_id' => Auth::user()->school_id,
                     'class_id' => $class->id,
@@ -145,7 +144,6 @@ class SchoolClassController extends Controller
             }
         }
 
-
         return redirect()->route('classes.index')
             ->with('success', 'Class Updated Successfully');
     }
@@ -153,10 +151,11 @@ class SchoolClassController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($school, SchoolClass $class)
     {
-        $class = SchoolClass::where('school_id', Auth::user()->school_id)
-            ->findOrFail($id);
+        if ($class->school_id != Auth::user()->school_id) {
+            abort(404);
+        }
 
         // Delete Sections
         Section::where('class_id', $class->id)->update([
@@ -164,11 +163,6 @@ class SchoolClassController extends Controller
         ]);
 
         // Delete Class
-        $class->update([
-            'status' => 0
-        ]);
-
-        // Soft Delete (Better for ERP)
         $class->update([
             'status' => 0
         ]);

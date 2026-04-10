@@ -113,17 +113,17 @@
 
                             <div class="flex justify-end gap-4">
 
-                                <a href="{{ route('students.show', $student->id) }}"
+                                <a href="{{ route('students.show', $student) }}"
                                     class="text-green-600 hover:text-green-800 font-medium">
                                     View
                                 </a>
 
-                                <a href="{{ route('students.edit', $student->id) }}"
+                                <a href="{{ route('students.edit', $student) }}"
                                     class="text-blue-600 hover:text-blue-800 font-medium">
                                     Edit
                                 </a>
 
-                                <form action="{{ route('students.destroy', $student->id) }}" method="POST"
+                                <form action="{{ route('students.destroy', $student) }}" method="POST"
                                     onsubmit="return confirm('Are you sure you want to delete this student?')">
 
                                     @csrf

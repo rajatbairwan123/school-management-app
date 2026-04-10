@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 class RegisteredUserController extends Controller
 {
@@ -37,12 +38,21 @@ class RegisteredUserController extends Controller
             'role' => ['required', 'string'],
         ]);
 
+        $username = Str::slug($request->name);
+
+        $count = User::where('username', 'LIKE', $username . '%')->count();
+
+        if ($count) {
+            $username = $username . '-' . ($count + 1);
+        }
+
         $user = User::create([
             'name' => $request->name,
+            'username' => $username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
-            'school_id' => 1, // temporary (later dynamic)
+            'school_id' => session('school_id'), // temporary (later dynamic)
             'status' => 1
         ]);
 
