@@ -1,0 +1,10 @@
+@section('content')
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">
+            Dashboard student
+        </h1>
+    </div>
+
+
+    <!-- Stats Cards -->
+@endsection

@@ -17,6 +17,8 @@ Route::prefix('{school}')
     ->middleware(['school'])
     ->group(function () {
 
+        require __DIR__ . '/auth.php';
+
         Route::middleware(['auth'])->group(function () {
 
             // Dashboard
@@ -46,5 +48,3 @@ Route::prefix('{school}')
 
 
 Route::get('/get-sections/{id}', [StudentController::class, 'getSections']);
-
-require __DIR__ . '/auth.php';

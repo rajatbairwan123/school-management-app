@@ -11,25 +11,44 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $schoolId = Auth::user()->school_id;
+        $user = Auth::user();
+        // dd($user->role); // debug
+        $schoolId = $user->school_id;
 
-        $totalStudents = Student::where('school_id', $schoolId)
-            ->where('status', 1)
-            ->count();
+        // Admin Dashboard Data
+        if ($user->role == 'admin') {
 
-        $totalClasses = SchoolClass::where('school_id', $schoolId)
-            ->where('status', 1)
-            ->count();
+            $totalStudents = Student::where('school_id', $schoolId)
+                ->where('status', 1)
+                ->count();
 
-        $totalTeachers = User::where('school_id', $schoolId)
-            ->where('role', 'admin')
-            ->where('status', 1)
-            ->count();
+            $totalClasses = SchoolClass::where('school_id', $schoolId)
+                ->where('status', 1)
+                ->count();
 
-        return view('dashboard.index', compact(
-            'totalStudents',
-            'totalClasses',
-            'totalTeachers'
-        ));
+            $totalTeachers = User::where('school_id', $schoolId)
+                ->where('role', 'teacher') // <- changed (admin nahi teacher hona chahiye)
+                ->where('status', 1)
+                ->count();
+
+            return view('dashboard.index', compact(
+                'totalStudents',
+                'totalClasses',
+                'totalTeachers'
+            ));
+        }
+
+        // Teacher Dashboard Data
+        if ($user->role == 'teacher') {
+
+            return view('dashboard.index');
+        }
+
+        // Student Dashboard Data
+        if ($user->role == 'student') {
+            return view('dashboard.index');
+        }
+
+        return view('dashboard.index');
     }
 }
